@@ -1,5 +1,8 @@
 package org.lobo.euromillones.configuration;
 
+import org.lobo.euromillones.service.EstadisticaService;
+import org.lobo.euromillones.service.JugadaFeederService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,14 +14,31 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
+
 @Configuration
 @EnableJpaRepositories("org.lobo.euromillones.persistence.repository")
 @EnableTransactionManagement
 @EntityScan("org.lobo.euromillones.persistence.model")
 @EnableSwagger2
 public class EuromillonesConfiguration {
+    @Autowired
+    private EstadisticaService estadisticaService;
+    @Autowired
+    private JugadaFeederService jugadaFeederService;
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage("org.lobo.euromillones")).paths(PathSelectors.any()).build();
     }
+
+    @PostConstruct
+    private void initBaseDatos() {
+
+        jugadaFeederService.crearJugadasDesdeOrigen(LocalDate.of(2017, 12, 05));
+        estadisticaService.crearFrecuencias();
+
+    }
+
 }
