@@ -8,8 +8,10 @@ import org.lobo.euromillones.service.mapper.FrecuenciaMapper;
 import org.lobo.euromillones.service.model.FrecuenciaVO;
 import org.lobo.euromillones.service.model.SecuenciaVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +27,8 @@ public class EstadisticaService {
     @Autowired
     private FrecuenciaMapper frecuenciaMapper;
 
+    @Transactional
+    @Async
     public void crearFrecuencias() {
         Iterable<Jugada> jugadas = jugadaRepository.findAll();
         List<Frecuencia> frecuencias = calcularFrecuenciasDeJugadas(jugadas);
@@ -147,22 +151,23 @@ public class EstadisticaService {
         return numeros;
     }
 
-  public List<SecuenciaVO> obtenerEstrellas(LocalDate fechaInicial, LocalDate fechaFinal) {
-      Iterable<Jugada> jugadas =
-          jugadaRepository.findByFechaGreaterThanEqualAndFechaLessThanEqual(fechaInicial, fechaFinal);
-      Map<Set<String>, Integer> map = new HashMap<>();
-      jugadas.forEach(jugada -> createSequenceMap(estrellaToListString(jugada),2,  map));
-      List<SecuenciaVO> secuenciaVOS = map.entrySet().stream().map(entry -> {
-          SecuenciaVO secuenciaVO = new SecuenciaVO();
-          secuenciaVO.setNumeros(entry.getKey());
-          secuenciaVO.setFrecuencia(entry.getValue());
-          return secuenciaVO;
-      }).collect(Collectors.toList());
-      Collections.sort(secuenciaVOS, (o1, o2) -> {
-          return -1 * o1.getFrecuencia().compareTo(o2.getFrecuencia());
-      });
-      return secuenciaVOS;
-  }
+    public List<SecuenciaVO> obtenerEstrellas(LocalDate fechaInicial, LocalDate fechaFinal) {
+        Iterable<Jugada> jugadas =
+            jugadaRepository.findByFechaGreaterThanEqualAndFechaLessThanEqual(fechaInicial, fechaFinal);
+        Map<Set<String>, Integer> map = new HashMap<>();
+        jugadas.forEach(jugada -> createSequenceMap(estrellaToListString(jugada), 2, map));
+        List<SecuenciaVO> secuenciaVOS = map.entrySet().stream().map(entry -> {
+            SecuenciaVO secuenciaVO = new SecuenciaVO();
+            secuenciaVO.setNumeros(entry.getKey());
+            secuenciaVO.setFrecuencia(entry.getValue());
+            return secuenciaVO;
+        }).collect(Collectors.toList());
+        Collections.sort(secuenciaVOS, (o1, o2) -> {
+            return -1 * o1.getFrecuencia().compareTo(o2.getFrecuencia());
+        });
+        return secuenciaVOS;
+    }
+
     private List<String> estrellaToListString(Jugada jugada) {
         List<String> estrellas = new ArrayList<>();
         estrellas.add(jugada.getEstrella1());

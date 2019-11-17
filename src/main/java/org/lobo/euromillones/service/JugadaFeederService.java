@@ -7,9 +7,9 @@ import org.lobo.euromillones.service.model.FrecuenciaVO;
 import org.lobo.euromillones.service.model.JugadaVO;
 import org.lobo.euromillones.service.model.SecuenciaVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -21,6 +21,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -51,7 +54,7 @@ public class JugadaFeederService {
      *
      * @param fechaInicial the fecha inicial
      */
-    @Transactional
+    @Async("taskExecutor")
     public void crearJugadasDesdeOrigen(LocalDate fechaInicial) {
         LocalDate fecha = fechaInicial;
         final int incrementoMartesAViernes = 3;
@@ -59,15 +62,11 @@ public class JugadaFeederService {
         LocalDate hoy = LocalDate.now();
         if (fechaInicial.getDayOfWeek().equals(DayOfWeek.TUESDAY)
             || fechaInicial.getDayOfWeek().equals(DayOfWeek.FRIDAY)) {
+            List<Callable<Void>> salvaJugadaThreads = new ArrayList<>();
             jugadaRepository.deleteAll();
             boolean esMartes = fechaInicial.getDayOfWeek().equals(DayOfWeek.TUESDAY);
             while (fecha.isBefore(hoy)) {
-                log.info("Recuperando jugada para la fecha {}", fecha);
-                JugadaVO jugadaVO = this.getJugadaPorFecha(fecha);
-                if (null != jugadaVO) {
-                    jugadaVO.setFecha(fecha);
-                    jugadaRepository.save(jugadaMapper.VoToEntity(jugadaVO));
-                }
+                salvaJugadaThreads.add(getSalvarJugadaThread(fecha));
                 if (esMartes) {
                     fecha = fecha.plus(incrementoMartesAViernes, ChronoUnit.DAYS);
                 } else {
@@ -75,11 +74,35 @@ public class JugadaFeederService {
                 }
                 esMartes = !esMartes;
             }
+            ExecutorService executorService = Executors.newFixedThreadPool(4);
+            try {
+                executorService.invokeAll(salvaJugadaThreads);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         } else {
             log.error("El día inicial no es ni jueves ni martes");
         }
     }
 
+
+    public Callable<Void> getSalvarJugadaThread(LocalDate fecha) {
+        Callable<Void> callable = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                log.info("Recuperando jugada para la fecha {}", fecha);
+                JugadaVO jugadaVO = getJugadaPorFecha(fecha);
+                if (null != jugadaVO) {
+                    jugadaVO.setFecha(fecha);
+                    jugadaRepository.save(jugadaMapper.VoToEntity(jugadaVO));
+                }
+                return null;
+            }
+
+        };
+
+        return callable;
+    }
 
     /**
      * Gets jugada por fecha.

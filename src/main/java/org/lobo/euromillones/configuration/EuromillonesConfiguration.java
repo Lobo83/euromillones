@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -22,6 +25,7 @@ import java.time.LocalDate;
 @EnableTransactionManagement
 @EntityScan("org.lobo.euromillones.persistence.model")
 @EnableSwagger2
+@EnableAsync
 public class EuromillonesConfiguration {
     @Autowired
     private EstadisticaService estadisticaService;
@@ -39,6 +43,17 @@ public class EuromillonesConfiguration {
         jugadaFeederService.crearJugadasDesdeOrigen(LocalDate.of(2017, 12, 05));
         estadisticaService.crearFrecuencias();
 
+    }
+
+    @Bean
+    public TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(100);
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setThreadNamePrefix("Async-");
+        return executor;
     }
 
 }
