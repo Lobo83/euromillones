@@ -10,10 +10,10 @@ spring:
 
     hibernate:
       ddl-auto: create
-    properties:
-      hibernate:
-        jdbc:
-          batch_size: 10
-        order_inserts: true
-        generate_statistics: true
+    #properties:
+      #hibernate:
+        #jdbc:
+         # batch_size: 10
+        #order_inserts: true
+        #generate_statistics: true
 
