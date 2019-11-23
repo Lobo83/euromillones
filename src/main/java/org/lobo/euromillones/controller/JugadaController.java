@@ -33,14 +33,23 @@ public class JugadaController {
         jugadaFeederService.crearJugadasDesdeOrigen(fecha);
     }
 
-    @GetMapping("/generar")
-    public List<JugadaVO> generarJugadas(@RequestParam(name = "longitud") Integer longitud, @RequestParam(name = "fechaInicial") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaInicial, @RequestParam(name = "fechaFinal", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaFinal, @RequestParam(name = "numero") Integer numeroJugadas, @RequestParam(name = "frecuenciaMinima") Integer frecuenciaMinima) {
+    @GetMapping("/generar/frecuencia")
+    public List<JugadaVO> generarJugadasFrecuentes(@RequestParam(name = "longitud") Integer longitud, @RequestParam(name = "fechaInicial") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaInicial, @RequestParam(name = "fechaFinal", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaFinal, @RequestParam(name = "numeroJugadas") Integer numeroJugadas, @RequestParam(name = "frecuenciaMinima") Integer frecuenciaMinima) {
         if (null == fechaFinal) {
             fechaFinal = LocalDate.now();
         }
 
         EstrategiaJugadaVO estrategiaJugadaVO =
             EstrategiaJugadaVO.builder().tipoEstrategia(TipoEstrategia.FRECUENCIA).fechaFinal(fechaFinal).fechaInicial(fechaInicial).frecuenciaMinima(frecuenciaMinima).numeroJugadas(numeroJugadas).longitudSecuencia(longitud).build();
+        return generadorJugada.generarJugadas(estrategiaJugadaVO);
+    }
+
+    @GetMapping("/generar/aleatoria")
+    public List<JugadaVO> generarJugadasAleatorias(@RequestParam(name = "numeroJugadas") Integer numeroJugadas) {
+
+
+        EstrategiaJugadaVO estrategiaJugadaVO =
+            EstrategiaJugadaVO.builder().tipoEstrategia(TipoEstrategia.ALEATORIA).numeroJugadas(numeroJugadas).build();
         return generadorJugada.generarJugadas(estrategiaJugadaVO);
     }
 }
