@@ -40,7 +40,7 @@ public class EuromillonesConfiguration {
     @PostConstruct
     private void initBaseDatos() {
 
-        jugadaFeederService.crearJugadasDesdeOrigen(LocalDate.of(2004, 2, 13));
+        jugadaFeederService.crearJugadasDesdeOrigen(LocalDate.of(2017, 12, 05));
         estadisticaService.crearFrecuencias();
 
     }
