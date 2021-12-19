@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The type Estadistica service.
+ */
 @Service
 public class EstadisticaService {
     @Autowired
@@ -27,6 +30,9 @@ public class EstadisticaService {
     @Autowired
     private FrecuenciaMapper frecuenciaMapper;
 
+    /**
+     * Crear frecuencias.
+     */
     @Transactional
     @Async
     public void crearFrecuencias() {
@@ -35,6 +41,14 @@ public class EstadisticaService {
         frecuenciaRepository.saveAll(frecuencias);
     }
 
+    /**
+     * Obtener frecuencias list.
+     *
+     * @param fechaInicial the fecha inicial
+     * @param fechaFinal the fecha final
+     *
+     * @return the list
+     */
     public List<FrecuenciaVO> obtenerFrecuencias(LocalDate fechaInicial, LocalDate fechaFinal) {
         Iterable<Jugada> jugadas =
             jugadaRepository.findByFechaGreaterThanEqualAndFechaLessThanEqual(fechaInicial, fechaFinal);
@@ -102,6 +116,15 @@ public class EstadisticaService {
         }
     }
 
+    /**
+     * Obtener secuencias list.
+     *
+     * @param longitud the longitud
+     * @param fechaInicial the fecha inicial
+     * @param fechaFinal the fecha final
+     *
+     * @return the list
+     */
     public List<SecuenciaVO> obtenerSecuencias(Integer longitud, LocalDate fechaInicial, LocalDate fechaFinal) {
         Iterable<Jugada> jugadas =
             jugadaRepository.findByFechaGreaterThanEqualAndFechaLessThanEqual(fechaInicial, fechaFinal);
@@ -119,6 +142,13 @@ public class EstadisticaService {
         return secuenciaVOS;
     }
 
+    /**
+     * Create sequence map.
+     *
+     * @param numeros the numeros
+     * @param tamSequencia the tam sequencia
+     * @param map the map
+     */
     public void createSequenceMap(List<String> numeros, Integer tamSequencia, Map<Set<String>, Integer> map) {
         for (int i = 0; i < numeros.size() - 1; i++) {
             Set<String> secuenciaBase = new LinkedHashSet<>();
@@ -151,6 +181,14 @@ public class EstadisticaService {
         return numeros;
     }
 
+    /**
+     * Obtener estrellas list.
+     *
+     * @param fechaInicial the fecha inicial
+     * @param fechaFinal the fecha final
+     *
+     * @return the list
+     */
     public List<SecuenciaVO> obtenerEstrellas(LocalDate fechaInicial, LocalDate fechaFinal) {
         Iterable<Jugada> jugadas =
             jugadaRepository.findByFechaGreaterThanEqualAndFechaLessThanEqual(fechaInicial, fechaFinal);

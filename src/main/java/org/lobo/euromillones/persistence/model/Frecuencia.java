@@ -5,6 +5,9 @@ import lombok.Data;
 import javax.persistence.*;
 
 
+/**
+ * The type Frecuencia.
+ */
 @Entity
 @Table(name = "frecuencia")
 @Data

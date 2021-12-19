@@ -15,7 +15,7 @@ import java.util.List;
  * The type Estadistica controller.
  */
 @RestController
-@RequestMapping("/estadistica")
+@RequestMapping("/estadisticas")
 public class EstadisticaController {
 
     @Autowired
@@ -24,7 +24,7 @@ public class EstadisticaController {
     /**
      * Calcular frecuencias.
      */
-    @PostMapping(value = "/calcular_frecuencias")
+    @PostMapping(value = "/")
     public void calcularFrecuencias() {
         estadisticaService.crearFrecuencias();
     }
@@ -37,7 +37,7 @@ public class EstadisticaController {
      *
      * @return the list
      */
-    @GetMapping(value = "/obtener_frecuencias")
+    @GetMapping(value = "/frecuencias")
     public List<FrecuenciaVO> obtenerFrecuencias(@RequestParam(name = "fechaInicial") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaInicial, @RequestParam(name = "fechaFinal", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaFinal) {
         if (null == fechaFinal) {
             fechaFinal = LocalDate.now();
@@ -54,7 +54,7 @@ public class EstadisticaController {
      *
      * @return the list
      */
-    @GetMapping(value = "/obtener_secuencias_frecuentes")
+    @GetMapping(value = "/secuencias")
     public List<SecuenciaVO> obtenerSecuenciasFrecuentes(@RequestParam(name = "longitud") Integer longitud, @RequestParam(name = "fechaInicial") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaInicial, @RequestParam(name = "fechaFinal", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaFinal) {
         if (null == fechaFinal) {
             fechaFinal = LocalDate.now();
@@ -70,7 +70,7 @@ public class EstadisticaController {
      *
      * @return the list
      */
-    @GetMapping(value = "/obtener_estrellas_frecuentes")
+    @GetMapping(value = "/estrellas_frecuentes")
     public List<SecuenciaVO> obtenerEstrellasFrecuentes(@RequestParam(name = "fechaInicial") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaInicial, @RequestParam(name = "fechaFinal", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaFinal) {
         if (null == fechaFinal) {
             fechaFinal = LocalDate.now();

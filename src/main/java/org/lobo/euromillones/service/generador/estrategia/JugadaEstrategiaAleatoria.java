@@ -19,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The type Jugada estrategia aleatoria.
+ */
 @Component
 public class JugadaEstrategiaAleatoria implements JugadaEstrategia {
 

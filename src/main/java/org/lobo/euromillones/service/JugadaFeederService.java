@@ -84,6 +84,13 @@ public class JugadaFeederService {
     }
 
 
+    /**
+     * Gets salvar jugada thread.
+     *
+     * @param fecha the fecha
+     *
+     * @return the salvar jugada thread
+     */
     public Callable<Void> getSalvarJugadaThread(LocalDate fecha) {
         Callable<Void> callable = new Callable<Void>() {
             @Override
@@ -106,6 +113,7 @@ public class JugadaFeederService {
      * Gets jugada por fecha.
      *
      * @param fecha the fecha
+     *
      * @return the jugada por fecha
      */
     public JugadaVO getJugadaPorFecha(LocalDate fecha) {
@@ -171,6 +179,9 @@ public class JugadaFeederService {
     }
 
 
+    /**
+     * Limpiar jugadas.
+     */
     public void limpiarJugadas() {
         jugadaRepository.deleteAll();
     }

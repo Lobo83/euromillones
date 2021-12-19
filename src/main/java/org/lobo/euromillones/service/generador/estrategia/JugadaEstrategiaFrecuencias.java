@@ -13,6 +13,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The type Jugada estrategia frecuencias.
+ */
 @Component
 public class JugadaEstrategiaFrecuencias implements JugadaEstrategia {
 

@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+/**
+ * The type Jugada vo.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
