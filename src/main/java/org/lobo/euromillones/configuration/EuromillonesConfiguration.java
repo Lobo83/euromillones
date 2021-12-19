@@ -11,6 +11,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -26,7 +30,10 @@ import java.time.LocalDate;
 @EntityScan("org.lobo.euromillones.persistence.model")
 @EnableSwagger2
 @EnableAsync
-public class EuromillonesConfiguration {
+@EnableWebMvc
+public class EuromillonesConfiguration implements WebMvcConfigurer
+{
+
     @Autowired
     private EstadisticaService estadisticaService;
     @Autowired
@@ -37,12 +44,19 @@ public class EuromillonesConfiguration {
         return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage("org.lobo.euromillones")).paths(PathSelectors.any()).build();
     }
 
-    @PostConstruct
-    private void initBaseDatos() {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+            .allowedMethods("GET", "POST");
+    }
 
-        jugadaFeederService.crearJugadasDesdeOrigen(LocalDate.of(2017, 12, 05));
-        estadisticaService.crearFrecuencias();
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("swagger-ui.html")
+            .addResourceLocations("classpath:/META-INF/resources/");
 
+        registry.addResourceHandler("/webjars/**")
+            .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
     @Bean
@@ -56,4 +70,11 @@ public class EuromillonesConfiguration {
         return executor;
     }
 
+    @PostConstruct
+    private void initBaseDatos() {
+
+        jugadaFeederService.crearJugadasDesdeOrigen(LocalDate.of(2017, 12, 05));
+        estadisticaService.crearFrecuencias();
+
+    }
 }
